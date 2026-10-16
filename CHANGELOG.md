@@ -8,6 +8,11 @@ breaking changes bump the **minor** version, and they are called out as such.
 
 ## [Unreleased]
 
+- **`governance` (issue #670): the constructor iterates its members.**
+  `Governance::__constructor` pairs each member with its deposit by zipping the
+  two vectors instead of indexing them with `get(i).unwrap()`. The vectors are
+  already checked to have equal length, so behaviour for every valid input is
+  unchanged and the constructor has no panic path left.
 - security(multisig): implement 14-day TTL expiration for pending signatures and approvals (#449)
 - **`nft` (issue #453): Discount coupon NFTs for merchant stores.** New coupon
   module (`contracts/refund-vault/src/coupons.rs`) implements single-use discount
