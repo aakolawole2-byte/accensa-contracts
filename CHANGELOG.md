@@ -8,6 +8,17 @@ breaking changes bump the **minor** version, and they are called out as such.
 
 ## [Unreleased]
 
+- **`governance` (issue #447): 48-hour timelock for approved proposals.**
+  New `timelock` module. Once `enable_timelock` has been called (gated like
+  `set_treasury_token`, and permanent), an approved proposal has to be queued
+  with `queue_transaction` and can only execute `34_560` ledgers (48 hours)
+  later, through `execute_queued_transaction` or a plain `execute`; earlier
+  attempts fail with `Error::TimelockNotExpired`, and an unqueued one with
+  `Error::TimelockRequired`. The queue entry stores the SHA-256 of
+  `(target, function, args)` and the unlock ledger, and queueing extends the
+  proposal's TTL so it outlives the delay. The timelock is off by default, so
+  existing deployments behave as before. Adds `Error::TimelockRequired` (32),
+  `TimelockNotExpired` (33) and `AlreadyQueued` (34).
 - security(multisig): implement 14-day TTL expiration for pending signatures and approvals (#449)
 - **`nft` (issue #453): Discount coupon NFTs for merchant stores.** New coupon
   module (`contracts/refund-vault/src/coupons.rs`) implements single-use discount
