@@ -18,6 +18,11 @@ breaking changes bump the **minor** version, and they are called out as such.
   without a lock has exactly the weight they had before. The escrowed token is
   set once with `set_ve_token`, gated like `set_treasury_token`. Escrow errors
   are a separate `VeError` enum, so the governance `Error` spec does not grow.
+- **`governance` (issue #670): the constructor iterates its members.**
+  `Governance::__constructor` pairs each member with its deposit by zipping the
+  two vectors instead of indexing them with `get(i).unwrap()`. The vectors are
+  already checked to have equal length, so behaviour for every valid input is
+  unchanged and the constructor has no panic path left.
 - **`governance` (issue #447): 48-hour timelock for approved proposals.**
   New `timelock` module. Once `enable_timelock` has been called (gated like
   `set_treasury_token`, and permanent), an approved proposal has to be queued
