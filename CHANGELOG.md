@@ -18,6 +18,24 @@ breaking changes bump the **minor** version, and they are called out as such.
   without a lock has exactly the weight they had before. The escrowed token is
   set once with `set_ve_token`, gated like `set_treasury_token`. Escrow errors
   are a separate `VeError` enum, so the governance `Error` spec does not grow.
+- **`refund-vault` (issue #689): `on_settled` walks the fee ladder without indexing.**
+  The promoting rung's fee is read by iterating the ladder, so an out-of-range rung can no longer trap the claim path. Behaviour for every valid ladder is unchanged.
+- **`insurance` (issue #608): assert deposit, withdraw, borrow and repay lifecycle events.**
+  Extended `contracts/insurance/src/test.rs` with `lifecycle_events` asserting exact event XDR, cross-checking storage values, and asserting zero balance on emptied positions.
+- **`receipt-shard` (issue #678): return typed error on missing state in has_live_records.**
+  `has_live_records` returns `Result<bool, Error>` with `Error::NotInitialized` when `StartBatchId` or `EndBatchId` is absent from instance storage instead of trapping.
+- **`privacy` (issue #439): dual-key stealth-address registry for vault deposits.**
+  New `stealth` module on BN254 G1 (the SDK's `bn254` host functions). A
+  recipient publishes a spend key `S` and a view key `V` with
+  `register_stealth_keys`; a buyer derives, off chain, an ephemeral key `R = r*G`
+  and a one-time stealth key `P = S + H(r*V)*G` and calls `stealth_deposit`,
+  which takes the tokens into custody and emits `R` and `P` for the recipient to
+  scan (`P' = S + H(v*R)*G`). `stealth_claim` pays the deposit out against a
+  Schnorr proof of knowledge of `p = s + H(v*R)`, bound to the deposit and to the
+  receiving account, so a proof cannot be replayed or redirected. Errors are a
+  module-local `StealthError`. The derivation helpers
+  (`derive_stealth_address`, `scan_stealth_address`, `stealth_private_key`) are
+  library functions for off-chain code.
 - **`cross-chain` / `governance`: panic paths now return typed errors (#669, #671, #672, #673).**
   `cross-chain::verify_vaa` no longer unwraps `vaa.signatures.get(i)` or the
   guardian lookup: signatures are iterated, and a guardian index past the end of
