@@ -18,6 +18,24 @@ breaking changes bump the **minor** version, and they are called out as such.
   without a lock has exactly the weight they had before. The escrowed token is
   set once with `set_ve_token`, gated like `set_treasury_token`. Escrow errors
   are a separate `VeError` enum, so the governance `Error` spec does not grow.
+- **`refund-policy-vdf` (issue #702): unit tests for fallback dispute resolution.**
+  Extended `contracts/refund-policy-vdf/src/test.rs` with coverage for `request_dispute`, `oracle_request_bytes`, and `settle_dispute`.
+- **`stream-vault` / `multisig-account` (issues #752, #754): rustdoc coverage
+  for the exported surface missing `///` comments.**
+  `contracts/stream-vault/src/lib.rs` now documents `DataKey`, `StreamVault`,
+  `get_merchant` and `get_token`; `contracts/multisig-account/src/weights.rs`
+  documents `store_signer_list`, `store_signer_weight` and
+  `clear_signer_weight`. Doc comments only — no signature, body or behavior
+  change.
+- **`refund-vault-factory` / `oracle` (issues #562, #563): test the fee hardcap
+  boundary and the oracle read surface.**
+  `factory_tests.rs` proves `create_vault` rejects 501 bp with
+  `Error::FeeExceedsHardcap` without advancing the salt counter, tracking a
+  vault or changing TVL, and accepts the inclusive 500 bp boundary with the fee
+  stored on the new vault. `oracle/src/test.rs` round-trips stored rounds
+  through `get_round_data` and `latest_round_data`, asserts the typed `NoData`
+  error for an unknown round id and an empty feed, and checks `get_admin`
+  returns the constructor address. Test-only — no contract behavior change.
 - **`refund-vault` (issue #689): `on_settled` walks the fee ladder without indexing.**
   The promoting rung's fee is read by iterating the ladder, so an out-of-range rung can no longer trap the claim path. Behaviour for every valid ladder is unchanged.
 - **`insurance` (issue #608): assert deposit, withdraw, borrow and repay lifecycle events.**
